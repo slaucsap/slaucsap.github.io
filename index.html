@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remo Audiovisual</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ffffff;
+      color: #1a3a6b;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: clamp(4rem, 10vw, 8rem) clamp(2rem, 8vw, 6rem) clamp(2rem, 5vw, 4rem);
+      gap: 2.5rem;
+    }
+
+    /* ── LOGO SPINNING (FIDGET SPINNER STYLE) ── */
+    .logo-wrap {
+      width: clamp(100px, 18vw, 160px);
+      perspective: 600px;
+      cursor: pointer;
+      /* Evita que se seleccione el elemento o la imagen al clickear rápido */
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .logo {
+      width: 100%;
+      display: block;
+      transform-style: preserve-3d;
+      backface-visibility: visible;
+      will-change: transform;
+    }
+
+    .desc {
+      max-width: 480px;
+      font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+      line-height: 1.8;
+      color: #1a3a6b;
+      opacity: 0.8;
+    }
+
+    .services {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .service-item {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #1a3a6b;
+      opacity: 0.5;
+    }
+
+    .divider { width: 100%; height: 1px; background: #d8e4f5; }
+
+    /* ── VIDEOS ── */
+    .videos-section {
+      padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .carousel-wrapper { width: 100%; max-width: 960px; }
+    .carousel { overflow: hidden; }
+
+    .carousel-track {
+      display: flex;
+      gap: 1.25rem;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .carousel-slide {
+      min-width: calc((100% - 1.25rem) / 2);
+      flex-shrink: 0;
+    }
+
+    .carousel-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: none;
+      display: block;
+    }
+
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .nav-btn {
+      background: none;
+      border: 1px solid #1a3a6b;
+      color: #1a3a6b;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      opacity: 0.6;
+    }
+    .nav-btn:hover { background: #1a3a6b; color: #fff; opacity: 1; }
+
+    .carousel-dots { display: flex; gap: 0.5rem; align-items: center; }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #1a3a6b;
+      opacity: 0.2;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .dot.active { opacity: 0.8; transform: scale(1.3); }
+
+    .more-btn {
+      display: inline-block;
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #1a3a6b;
+      border: 1px solid #1a3a6b;
+      padding: 0.85rem 2.5rem;
+      transition: background 0.2s, color 0.2s;
+      opacity: 0.7;
+      margin-top: 0.5rem;
+    }
+    .more-btn:hover { background: #1a3a6b; color: #fff; opacity: 1; }
+
+    footer {
+      padding: clamp(1.2rem, 3vw, 2rem) clamp(2rem, 8vw, 6rem);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      border-top: 1px solid #d8e4f5;
+      margin-top: auto;
+    }
+
+    footer a {
+      font-size: 0.76rem;
+      color: #1a3a6b;
+      opacity: 0.55;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    footer a:hover { opacity: 1; }
+
+    @media (max-width: 600px) {
+      .carousel-slide { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="logo-wrap" id="logoContainer">
+      <img class="logo" id="spinnerLogo" src="logo.png" alt="Remo Audiovisual" />
+    </div>
+
+    <p class="desc">
+      Compañía dedicada a generar contenidos, realizar ideas y trabajar en colaboración. Desde el 2017 hemos trabajado entre profesionales del cine, arte, diseño y publicidad, abordando los proyectos desde su génesis hasta su finalización.
+    </p>
+
+    <div class="services">
+      <span class="service-item">Creatividad</span>
+      <span class="service-item">Rodaje</span>
+      <span class="service-item">Postproducción</span>
+    </div>
+  </main>
+
+  <div class="divider"></div>
+
+  <section class="videos-section">
+    <div class="carousel-wrapper">
+      <div class="carousel">
+        <div class="carousel-track" id="track">
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/460239571?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/261017310?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/892339509?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/1139138680?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/740466588?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/433828927?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/114778654?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/412111826?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/836969620?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/460820978?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/526596962?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+        </div>
+      </div>
+
+      <div class="carousel-nav">
+        <button class="nav-btn" id="prev">&#8592;</button>
+        <div class="carousel-dots" id="dots"></div>
+        <button class="nav-btn" id="next">&#8594;</button>
+      </div>
+    </div>
+
+    <a class="more-btn" href="https://vimeo.com/remoaudiovisual" target="_blank" rel="noopener">Más</a>
+  </section>
+
+  <footer>
+    <a href="mailto:felipe@remoaudiovisual.cl">felipe@remoaudiovisual.cl</a>
+    <a href="mailto:pascual@remoaudiovisual.cl">pascual@remoaudiovisual.cl</a>
+  </footer>
+
+  <script>
+    /* ── LÓGICA DEL SPINNER EN EL LOGO ── */
+    const logo = document.getElementById('spinnerLogo');
+    const container = document.getElementById('logoContainer');
+
+    let angle = 0;          // Ángulo actual de rotación
+    let velocity = 1.5;     // Velocidad inicial constante (giro suave por defecto)
+    const friction = 0.985; // Factor de desaceleración (fricción)
+    const baseSpeed = 1.5;  // Velocidad mínima a la que siempre regresa
+
+    function updateSpinner() {
+      // Avanzar el ángulo según la velocidad actual
+      angle += velocity;
+      if (angle >= 360) angle -= 360;
+
+      // Normalizar el ángulo para calcular si está "de espalda"
+      const normalizedAngle = angle % 360;
+      
+      // Si el ángulo está entre 90° y 270°, el logo está invertido visualmente por el giro.
+      // Le aplicamos scaleX(-1) en ese tramo para corregir la lectura de "REMO".
+      if (normalizedAngle > 90 && normalizedAngle < 270) {
+        logo.style.transform = `rotateY(${angle}deg) scaleX(-1)`;
+      } else {
+        logo.style.transform = `rotateY(${angle}deg)`;
+      }
+
+      // Si la velocidad es mayor al movimiento base, aplicar fricción para frenarlo poco a poco
+      if (velocity > baseSpeed) {
+        velocity *= friction;
+        // Si baja demasiado cerca del base, la fijamos
+        if (velocity < baseSpeed + 0.1) velocity = baseSpeed;
+      }
+
+      requestAnimationFrame(updateSpinner);
+    }
+
+    // Al hacer clic o tocar el logo, sumamos velocidad acumulativa
+    container.addEventListener('click', () => {
+      velocity += 15; // Añade un impulso fuerte de rotación. Puedes cambiar este número para ajustar la fuerza.
+    });
+
+    // Iniciar la animación del logo
+    requestAnimationFrame(updateSpinner);
+
+
+    /* ── LÓGICA DEL CAROUSEL DE VIDEOS ── */
+    const track = document.getElementById('track');
+    const dotsContainer = document.getElementById('dots');
+    const total = 11;
+    let current = 0;
+
+    function getVisible() { return window.innerWidth <= 600 ? 1 : 2; }
+    function getSteps() { return Math.ceil(total / getVisible()); }
+
+    function buildDots() {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < getSteps(); i++) {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i === 0 ? ' active' : '');
+        d.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(d);
+      }
+    }
+
+    function goTo(n) {
+      const steps = getSteps();
+      current = (n + steps) % steps;
+      const gap = 20;
+      const slideWidth = track.children[0].offsetWidth;
+      track.style.transform = 'translateX(-' + (current * getVisible() * (slideWidth + gap)) + 'px)';
+      document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    buildDots();
+    document.getElementById('prev').addEventListener('click', () => goTo(current - 1));
+    document.getElementById('next').addEventListener('click', () => goTo(current + 1));
+    window.addEventListener('resize', () => { current = 0; buildDots(); goTo(0); });
+
+    let startX = 0;
+    track.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    track.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) goTo(diff > 0 ? current + 1 : current - 1);
+    });
+  </script>
+
+</body>
+</html>
