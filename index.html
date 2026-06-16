@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remo Audiovisual</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ffffff;
+      color: #1a3a6b;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: clamp(4rem, 10vw, 8rem) clamp(2rem, 8vw, 6rem) clamp(2rem, 5vw, 4rem);
+      gap: 2.5rem;
+    }
+
+    /* Contenedor invisible para reservar el espacio del logo central */
+    .logo-container-block {
+      width: clamp(100px, 18vw, 160px);
+      height: clamp(100px, 18vw, 160px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── LOGO SPINNING & DVD MODE ── */
+    .logo-wrap {
+      width: clamp(100px, 18vw, 160px);
+      perspective: 600px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: filter 0.2s ease;
+    }
+
+    /* Al activarse el modo DVD, se vuelve absoluto para flotar por la ventana */
+    .logo-wrap.dvd-mode {
+      position: fixed;
+      z-index: 9999;
+      margin: 0;
+      pointer-events: auto;
+    }
+
+    .logo {
+      width: 100%;
+      display: block;
+      transform-style: preserve-3d;
+      backface-visibility: visible;
+      will-change: transform;
+    }
+
+    /* ── PARTÍCULAS DE LA EXPLOSIÓN ── */
+    .particle {
+      position: fixed;
+      z-index: 10000;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: explode-particle 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes explode-particle {
+      0% {
+        transform: translate(-50%, -50%) translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) translate(var(--x), var(--var-y)) scale(0.2);
+        opacity: 0;
+      }
+    }
+
+    .desc {
+      max-width: 480px;
+      font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+      line-height: 1.8;
+      color: #1a3a6b;
+      opacity: 0.8;
+    }
+
+    .services {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .service-item {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #1a3a6b;
+      opacity: 0.5;
+    }
+
+    .divider { width: 100%; height: 1px; background: #d8e4f5; }
+
+    /* ── VIDEOS ── */
+    .videos-section {
+      padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .carousel-wrapper { width: 100%; max-width: 960px; }
+    .carousel { overflow: hidden; }
+
+    .carousel-track {
+      display: flex;
+      gap: 1.25rem;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .carousel-slide {
+      min-width: calc((100% - 1.25rem) / 2);
+      flex-shrink: 0;
+    }
+
+    .carousel-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: none;
+      display: block;
+    }
+
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .nav-btn {
+      background: none;
+      border: 1px solid #1a3a6b;
+      color: #1a3a6b;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      opacity: 0.6;
+    }
+    .nav-btn:hover { background: #1a3a6b; color: #fff; opacity: 1; }
+
+    .carousel-dots { display: flex; gap: 0.5rem; align-items: center; }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #1a3a6b;
+      opacity: 0.2;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .dot.active { opacity: 0.8; transform: scale(1.3); }
+
+    .more-btn {
+      display: inline-block;
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #1a3a6b;
+      border: 1px solid #1a3a6b;
+      padding: 0.85rem 2.5rem;
+      transition: background 0.2s, color 0.2s;
+      opacity: 0.7;
+      margin-top: 0.5rem;
+    }
+    .more-btn:hover { background: #1a3a6b; color: #fff; opacity: 1; }
+
+    footer {
+      padding: clamp(1.2rem, 3vw, 2rem) clamp(2rem, 8vw, 6rem);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      border-top: 1px solid #d8e4f5;
+      margin-top: auto;
+    }
+
+    footer a {
+      font-size: 0.76rem;
+      color: #1a3a6b;
+      opacity: 0.55;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    footer a:hover { opacity: 1; }
+
+    @media (max-width: 600px) {
+      .carousel-slide { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="logo-container-block" id="logoAnchor">
+      <div class="logo-wrap" id="logoContainer">
+        <img class="logo" id="spinnerLogo" src="data:image/jpeg;base64,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" alt="Remo Audiovisual" />
+      </div>
+    </div>
+
+    <p class="desc">
+      Compañía dedicada a generar contenidos, realizar ideas y trabajar en colaboración. Desde el 2017 hemos trabajado entre profesionales del cine, arte, diseño y publicidad, abordando los proyectos desde su génesis hasta su finalización.
+    </p>
+
+    <div class="services">
+      <span class="service-item">Creatividad</span>
+      <span class="service-item">Rodaje</span>
+      <span class="service-item">Postproducción</span>
+    </div>
+  </main>
+
+  <div class="divider"></div>
+
+  <section class="videos-section">
+    <div class="carousel-wrapper">
+      <div class="carousel">
+        <div class="carousel-track" id="track">
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/460239571?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/261017310?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/892339509?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/1139138680?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/740466588?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/433828927?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/114778654?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/412111826?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/836969620?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/460820978?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/526596962?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+        </div>
+      </div>
+
+      <div class="carousel-nav">
+        <button class="nav-btn" id="prev">&#8592;</button>
+        <div class="carousel-dots" id="dots"></div>
+        <button class="nav-btn" id="next">&#8594;</button>
+      </div>
+    </div>
+
+    <a class="more-btn" href="https://vimeo.com/remoaudiovisual" target="_blank" rel="noopener">Más</a>
+  </section>
+
+  <footer>
+    <a href="mailto:felipe@remoaudiovisual.cl">felipe@remoaudiovisual.cl</a>
+    <a href="mailto:pascual@remoaudiovisual.cl">pascual@remoaudiovisual.cl</a>
+  </footer>
+
+  <script>
+    /* ── LÓGICA DEL SPINNER & EASTER EGG DVD ── */
+    const logo = document.getElementById('spinnerLogo');
+    const container = document.getElementById('logoContainer');
+    const anchor = document.getElementById('logoAnchor');
+
+    let angle = 0;          
+    let velocity = 0.75;     
+    const friction = 0.985; 
+    const baseSpeed = 0.75;  
+
+    // Variables para el contador del Easter Egg
+    let clickCount = 0;
+    let clickTimeout;
+    let isDvdMode = false;
+
+    // Física del rebote DVD
+    let posX = 0, posY = 0;
+    let speedX = 3; 
+    let speedY = 3; 
+
+    // Colores para las partículas de la explosión
+    const particleColors = ['#ff3333', '#33ff33', '#3333ff', '#ffff33', '#ff33ff', '#33ffff', '#ff9900'];
+
+    function changeColor() {
+      // Modifica dinámicamente el espectro de color de la imagen base64 completa
+      const randomColorFilter = `hue-rotate(${Math.floor(Math.random() * 360)}deg) saturate(3) brightness(1.2)`;
+      container.style.filter = randomColorFilter;
+    }
+
+    // Genera el efecto visual de explosión de partículas
+    function createExplosion(x, y) {
+      const particleCount = 12;
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Posicionar en el centro geométrico del logo al ser clickeado
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        
+        particle.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+        
+        // Dirección vectorial y dispersión aleatoria en 360 grados
+        const pAngle = Math.random() * Math.PI * 2;
+        const velocityDistance = 40 + Math.random() * 60; 
+        const targetX = Math.cos(pAngle) * velocityDistance + 'px';
+        const targetY = Math.sin(pAngle) * velocityDistance + 'px';
+        
+        particle.style.setProperty('--x', targetX);
+        particle.style.setProperty('--var-y', targetY);
+        
+        document.body.appendChild(particle);
+        
+        // Limpieza de memoria eliminando las partículas al terminar la animación
+        setTimeout(() => particle.remove(), 600);
+      }
+    }
+
+    function initDvdMode() {
+      isDvdMode = true;
+      const rect = container.getBoundingClientRect();
+      posX = rect.left;
+      posY = rect.top;
+
+      // Rompe la maquetación normal para flotar libremente por el Viewport
+      container.style.width = rect.width + 'px';
+      container.style.left = posX + 'px';
+      container.style.top = posY + 'px';
+      container.classList.add('dvd-mode');
+      
+      changeColor();
+    }
+
+    function resetToNormalMode() {
+      isDvdMode = false;
+      clickCount = 0;
+      
+      // Limpieza de estados, estilos flotantes y filtros cromáticos
+      container.classList.remove('dvd-mode');
+      container.style.position = '';
+      container.style.left = '';
+      container.style.top = '';
+      container.style.width = '';
+      container.style.filter = ''; 
+      
+      // Reinsertar de forma segura en el flujo estructural céntrico original
+      anchor.appendChild(container);
+    }
+
+    function updateSpinner() {
+      // 1. Manejo del Giro en el eje Y (Rotación simulada 3D)
+      angle += velocity;
+      if (angle >= 360) angle -= 360;
+
+      const normalizedAngle = angle % 360;
+      let transformStr = `rotateY(${angle}deg)`;
+      
+      // Evita el efecto espejo del texto/imagen en la mitad de la rotación invertida
+      if (normalizedAngle > 90 && normalizedAngle < 270) {
+        transformStr += ` scaleX(-1)`;
+      }
+
+      logo.style.transform = transformStr;
+
+      // Desaceleración por rozamiento (Fricción suave)
+      if (velocity > baseSpeed) {
+        velocity *= friction;
+        if (velocity < baseSpeed + 0.1) velocity = baseSpeed;
+      }
+
+      // 2. Control matemático de trayectorias y colisiones
+      if (isDvdMode) {
+        posX += speedX;
+        posY += speedY;
+
+        const logoWidth = container.offsetWidth;
+        const logoHeight = container.offsetHeight;
+        const winWidth = window.innerWidth;
+        const winHeight = window.innerHeight;
+
+        let hitWall = false;
+
+        // Rebotes en ejes horizontales
+        if (posX <= 0) {
+          posX = 0;
+          speedX = Math.abs(speedX);
+          hitWall = true;
+        } else if (posX + logoWidth >= winWidth) {
+          posX = winWidth - logoWidth;
+          speedX = -Math.abs(speedX);
+          hitWall = true;
+        }
+
+        // Rebotes en ejes verticales
+        if (posY <= 0) {
+          posY = 0;
+          speedY = Math.abs(speedY);
+          hitWall = true;
+        } else if (posY + logoHeight >= winHeight) {
+          posY = winHeight - logoHeight;
+          speedY = -Math.abs(speedY);
+          hitWall = true;
+        }
+
+        if (hitWall) {
+          changeColor();
+        }
+
+        container.style.left = posX + 'px';
+        container.style.top = posY + 'px';
+      }
+
+      requestAnimationFrame(updateSpinner);
+    }
+
+    container.addEventListener('click', (e) => {
+      velocity += 15; // Añade inercia rotacional al hacer clic
+
+      if (isDvdMode) {
+        // Ejecución de explosión y retorno inmediato
+        const rect = container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        createExplosion(centerX, centerY);
+        resetToNormalMode();
+      } else {
+        clickCount++;
+
+        // Ventana de enfriamiento de la ráfaga (1.5 segundos)
+        clearTimeout(clickTimeout);
+        clickTimeout = setTimeout(() => {
+          clickCount = 0;
+        }, 1500);
+
+        // Umbral de activación optimizado a 15 clics continuos
+        if (clickCount >= 15) {
+          initDvdMode();
+        }
+      }
+    });
+
+    requestAnimationFrame(updateSpinner);
+
+
+    /* ── LÓGICA DEL CAROUSEL DE VIDEOS ── */
+    const track = document.getElementById('track');
+    const dotsContainer = document.getElementById('dots');
+    const total = 11;
+    let current = 0;
+
+    function getVisible() { return window.innerWidth <= 600 ? 1 : 2; }
+    function getSteps() { return Math.ceil(total / getVisible()); }
+
+    function buildDots() {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < getSteps(); i++) {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i === 0 ? ' active' : '');
+        d.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(d);
+      }
+    }
+
+    function goTo(n) {
+      const steps = getSteps();
+      current = (n + steps) % steps;
+      const gap = 20;
+      const slideWidth = track.children[0].offsetWidth;
+      track.style.transform = 'translateX(-' + (current * getVisible() * (slideWidth + gap)) + 'px)';
+      document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    buildDots();
+    document.getElementById('prev').addEventListener('click', () => goTo(current - 1));
+    document.getElementById('next').addEventListener('click', () => goTo(current + 1));
+    window.addEventListener('resize', () => { current = 0; buildDots(); goTo(0); });
+
+    let startX = 0;
+    track.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    track.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) goTo(diff > 0 ? current + 1 : current - 1);
+    });
+  </script>
+
+</body>
+</html>
