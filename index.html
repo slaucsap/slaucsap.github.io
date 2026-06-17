@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remo Audiovisual</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ffffff;
+      color: #1a3a6b;
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: clamp(4rem, 10vw, 8rem) clamp(2rem, 8vw, 6rem) clamp(2rem, 5vw, 4rem);
+      gap: 2.5rem;
+    }
+
+    /* Contenedor ancla estático para reservar el espacio físico del logo central */
+    .logo-container-block {
+      width: clamp(100px, 18vw, 160px);
+      height: clamp(100px, 18vw, 160px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── LOGO SPINNING & DVD MODE ── */
+    .logo-wrap {
+      width: clamp(100px, 18vw, 160px);
+      perspective: 600px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      transition: filter 0.2s ease;
+    }
+
+    /* Al activarse el modo DVD, se vuelve absoluto y elimina transiciones para cambio a 0ms */
+    .logo-wrap.dvd-mode {
+      position: fixed;
+      z-index: 9999;
+      margin: 0;
+      pointer-events: auto;
+      transition: none !important;
+    }
+
+    .logo {
+      width: 100%;
+      display: block;
+      transform-style: preserve-3d;
+      backface-visibility: visible;
+      will-change: transform;
+    }
+
+    /* ── PARTÍCULAS DE LA EXPLOSIÓN ── */
+    .particle {
+      position: fixed;
+      z-index: 10000;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: explode-particle 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+
+    @keyframes explode-particle {
+      0% {
+        transform: translate(-50%, -50%) translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) translate(var(--x), var(--var-y)) scale(0.2);
+        opacity: 0;
+      }
+    }
+
+    .desc {
+      max-width: 480px;
+      font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+      line-height: 1.8;
+      color: #1a3a6b;
+      opacity: 0.8;
+    }
+
+    .services {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .service-item {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #1a3a6b;
+      opacity: 0.5;
+    }
+
+    .divider { width: 100%; height: 1px; background: #d8e4f5; }
+
+    /* ── VIDEOS ── */
+    .videos-section {
+      padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .carousel-wrapper { width: 100%; max-width: 960px; }
+    .carousel { overflow: hidden; }
+
+    .carousel-track {
+      display: flex;
+      gap: 1.25rem;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .carousel-slide {
+      min-width: calc((100% - 1.25rem) / 2);
+      flex-shrink: 0;
+    }
+
+    .carousel-slide iframe {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: none;
+      display: block;
+    }
+
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .nav-btn {
+      background: none;
+      border: 1px solid #1a3a6b;
+      color: #1a3a6b;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      opacity: 0.6;
+    }
+    .nav-btn:hover { background: #1a3a6b; color: #fff; opacity: 1; }
+
+    .carousel-dots { display: flex; gap: 0.5rem; align-items: center; }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #1a3a6b;
+      opacity: 0.2;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .dot.active { opacity: 0.8; transform: scale(1.3); }
+
+    .more-btn {
+      display: inline-block;
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #1a3a6b;
+      border: 1px solid #1a3a6b;
+      padding: 0.85rem 2.5rem;
+      transition: background 0.2s, color 0.2s;
+      opacity: 0.7;
+      margin-top: 0.5rem;
+    }
+    .more-btn:hover { background: #1a3a6b; color: #fff; opacity: 1; }
+
+    footer {
+      padding: clamp(1.2rem, 3vw, 2rem) clamp(2rem, 8vw, 6rem);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      border-top: 1px solid #d8e4f5;
+      margin-top: auto;
+    }
+
+    footer a {
+      font-size: 0.76rem;
+      color: #1a3a6b;
+      opacity: 0.55;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    footer a:hover { opacity: 1; }
+
+    @media (max-width: 600px) {
+      .carousel-slide { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="logo-container-block" id="logoAnchor">
+      <div class="logo-wrap" id="logoContainer">
+        <img class="logo" id="spinnerLogo" src="logo.png" alt="Remo Audiovisual" />
+      </div>
+    </div>
+
+    <p class="desc">
+      Compañía dedicada a generar contenidos, realizar ideas y trabajar en colaboración. Desde el 2017 hemos trabajado entre profesionales del cine, arte, diseño y publicidad, abordando los proyectos desde su génesis hasta su finalización.
+    </p>
+
+    <div class="services">
+      <span class="service-item">Creatividad</span>
+      <span class="service-item">Rodaje</span>
+      <span class="service-item">Postproducción</span>
+    </div>
+  </main>
+
+  <div class="divider"></div>
+
+  <section class="videos-section">
+    <div class="carousel-wrapper">
+      <div class="carousel">
+        <div class="carousel-track" id="track">
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/460239571?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/261017310?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/892339509?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/1139138680?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/740466588?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/433828927?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/114778654?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/412111826?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/836969620?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/460820978?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+          <div class="carousel-slide"><iframe src="https://player.vimeo.com/video/526596962?title=0&byline=0&portrait=0" allowfullscreen></iframe></div>
+        </div>
+      </div>
+
+      <div class="carousel-nav">
+        <button class="nav-btn" id="prev">&#8592;</button>
+        <div class="carousel-dots" id="dots"></div>
+        <button class="nav-btn" id="next">&#8594;</button>
+      </div>
+    </div>
+
+    <a class="more-btn" href="https://vimeo.com/remoaudiovisual" target="_blank" rel="noopener">Más</a>
+  </section>
+
+  <footer>
+    <a href="mailto:felipe@remoaudiovisual.cl">felipe@remoaudiovisual.cl</a>
+    <a href="mailto:pascual@remoaudiovisual.cl">pascual@remoaudiovisual.cl</a>
+  </footer>
+
+  <script>
+    /* ── LÓGICA DEL SPINNER & EASTER EGG DVD ── */
+    const logo = document.getElementById('spinnerLogo');
+    const container = document.getElementById('logoContainer');
+    const anchor = document.getElementById('logoAnchor');
+
+    let angle = 0;          
+    let velocity = 0.75;     
+    const friction = 0.985; 
+    const baseSpeed = 0.75;  
+
+    let clickCount = 0;
+    let clickTimeout;
+    let isDvdMode = false;
+    let hasCollidedYet = false; 
+
+    // Física del rebote DVD
+    let posX = 0, posY = 0;
+    let speedX = 4.5; 
+    let speedY = 4.5; 
+    let currentHue = 0; 
+
+    const particleColors = ['#ff3333', '#33ff33', '#3333ff', '#ffff33', '#ff33ff', '#33ffff', '#ff9900'];
+
+    function changeColor() {
+      let nextHue;
+      do {
+        nextHue = Math.floor(Math.random() * 360);
+      } while (Math.abs(nextHue - currentHue) < 90 || Math.abs(nextHue - currentHue) > 270);
+      
+      currentHue = nextHue;
+      container.style.filter = `hue-rotate(${currentHue}deg) saturate(3) brightness(1.2)`;
+    }
+
+    function createExplosion(x, y) {
+      const particleCount = 12;
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+        
+        const pAngle = Math.random() * Math.PI * 2;
+        const velocityDistance = 40 + Math.random() * 60; 
+        const targetX = Math.cos(pAngle) * velocityDistance + 'px';
+        const targetY = Math.sin(pAngle) * velocityDistance + 'px';
+        
+        particle.style.setProperty('--x', targetX);
+        particle.style.setProperty('--var-y', targetY);
+        
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 600);
+      }
+    }
+
+    function initDvdMode() {
+      isDvdMode = true;
+      hasCollidedYet = false; 
+      const rect = container.getBoundingClientRect();
+      posX = rect.left;
+      posY = rect.top;
+
+      container.style.width = rect.width + 'px';
+      container.style.left = posX + 'px';
+      container.style.top = posY + 'px';
+      container.classList.add('dvd-mode');
+      
+      changeColor();
+    }
+
+    function resetToNormalMode() {
+      isDvdMode = false;
+      hasCollidedYet = false;
+      clickCount = 0;
+      velocity = baseSpeed; 
+      angle = 0;
+      
+      container.classList.remove('dvd-mode');
+      container.style.position = '';
+      container.style.left = '';
+      container.style.top = '';
+      container.style.width = '';
+      container.style.filter = ''; 
+      
+      anchor.appendChild(container);
+    }
+
+    function updateSpinner() {
+      let transformStr = "";
+
+      if (isDvdMode) {
+        transformStr = "rotateY(0deg)";
+      } else {
+        angle += velocity;
+        if (angle >= 360) angle -= 360;
+
+        const normalizedAngle = angle % 360;
+        transformStr = `rotateY(${angle}deg)`;
+        
+        if (normalizedAngle > 90 && normalizedAngle < 270) {
+          transformStr += ` scaleX(-1)`;
+        }
+
+        if (velocity > baseSpeed) {
+          velocity *= friction;
+          if (velocity < baseSpeed + 0.1) velocity = baseSpeed;
+        }
+      }
+
+      logo.style.transform = transformStr;
+
+      if (isDvdMode) {
+        posX += speedX;
+        posY += speedY;
+
+        const logoWidth = container.offsetWidth;
+        const logoHeight = container.offsetHeight;
+        const winWidth = window.innerWidth;
+        const winHeight = window.innerHeight;
+
+        let hitWall = false;
+
+        if (posX <= 0) {
+          posX = 0;
+          speedX = Math.abs(speedX);
+          hitWall = true;
+        } else if (posX + logoWidth >= winWidth) {
+          posX = winWidth - logoWidth;
+          speedX = -Math.abs(speedX);
+          hitWall = true;
+        }
+
+        if (posY <= 0) {
+          posY = 0;
+          speedY = Math.abs(speedY);
+          hitWall = true;
+        } else if (posY + logoHeight >= winHeight) {
+          posY = winHeight - logoHeight;
+          speedY = -Math.abs(speedY);
+          hitWall = true;
+        }
+
+        if (hitWall) {
+          changeColor();
+          hasCollidedYet = true; 
+        }
+
+        container.style.left = posX + 'px';
+        container.style.top = posY + 'px';
+      }
+
+      requestAnimationFrame(updateSpinner);
+    }
+
+    container.addEventListener('pointerdown', (e) => {
+      if (isDvdMode) {
+        if (hasCollidedYet) {
+          const rect = container.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          
+          createExplosion(centerX, centerY);
+          resetToNormalMode();
+        }
+      } else {
+        velocity += 15; 
+        clickCount++;
+
+        clearTimeout(clickTimeout);
+        clickTimeout = setTimeout(() => {
+          clickCount = 0;
+        }, 1500);
+
+        if (clickCount >= 15) {
+          initDvdMode();
+        }
+      }
+    });
+
+    requestAnimationFrame(updateSpinner);
+
+
+    /* ── LÓGICA DEL CAROUSEL DE VIDEOS ── */
+    const track = document.getElementById('track');
+    const dotsContainer = document.getElementById('dots');
+    const total = 11;
+    let current = 0;
+
+    function getVisible() { return window.innerWidth <= 600 ? 1 : 2; }
+    function getSteps() { return Math.ceil(total / getVisible()); }
+
+    function buildDots() {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < getSteps(); i++) {
+        const d = document.createElement('div');
+        d.className = 'dot' + (i === 0 ? ' active' : '');
+        d.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(d);
+      }
+    }
+
+    function goTo(n) {
+      const steps = getSteps();
+      current = (n + steps) % steps;
+      const gap = 20;
+      const slideWidth = track.children[0].offsetWidth;
+      track.style.transform = 'translateX(-' + (current * getVisible() * (slideWidth + gap)) + 'px)';
+      document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    buildDots();
+    document.getElementById('prev').addEventListener('click', () => goTo(current - 1));
+    document.getElementById('next').addEventListener('click', () => goTo(current + 1));
+    window.addEventListener('resize', () => { current = 0; buildDots(); goTo(0); });
+
+    let startX = 0;
+    track.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    track.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) goTo(diff > 0 ? current + 1 : current - 1);
+    });
+  </script>
+
+</body>
+</html>
